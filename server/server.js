@@ -96,6 +96,22 @@ app.patch('/todos/:id', (req, res) => {
   })
 })
 
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User({
+    email: body.email,
+    password: body.password
+  })
+
+  user.save().then(() => {
+    return user.generateAuthToken(); //why return? This returns a token that the next .then can use
+  }).then((token) => {
+    res.header('x-auth', token).send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  })
+})
+
 app.listen(port, () => {
   console.log(`Started up at port ${port}`);
 });
